@@ -30,6 +30,12 @@ public class WeekViewEvent {
     private boolean alreadyset;
     private int myday;
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    private String imageUrl;
+
     public WeekViewEvent() {
 
     }
@@ -99,6 +105,9 @@ public class WeekViewEvent {
     public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, String accountname) {
         this(id, name, location, startTime, endTime, false, accountname);
     }
+    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, String accountname, String imageUrl) {
+        this(id, name, location, startTime, endTime, false, accountname, imageUrl);
+    }
 
     /**
      * Initializes the event for week view.
@@ -110,6 +119,20 @@ public class WeekViewEvent {
      */
     public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime, String accountname) {
         this(id, name, null, startTime, endTime, accountname);
+    }
+    public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime, String accountname, String imageUrl) {
+        this(id, name, null, startTime, endTime, accountname, imageUrl);
+    }
+
+    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean b, String accountname, String imageUrl) {
+        this.mId = id;
+        this.mName = name;
+        this.mLocation = location;
+        this.mStartTime = startTime;
+        this.mEndTime = endTime;
+        this.mAllDay = b;
+        this.accountname = accountname;
+        this.imageUrl = imageUrl;
     }
 
     public int getMyday() {
@@ -284,7 +307,6 @@ public class WeekViewEvent {
                 endOfOverDay.set(Calendar.HOUR_OF_DAY, 23);
                 endOfOverDay.set(Calendar.MINUTE, 59);
                 WeekViewEvent eventMore = new WeekViewEvent(this.getId(), this.getName(), null, overDay, endOfOverDay, this.isAllDay(), this.accountname);
-
                 eventMore.setColor(this.getColor());
                 eventMore.setIsmoreday(true);
                 eventMore.setActualstart(this.getStartTime());
@@ -293,7 +315,6 @@ public class WeekViewEvent {
                 eventMore.setDaytype(k);
                 eventMore.setNoofday(remainingDays);
                 events.add(eventMore);
-
                 // Add next day.
                 otherDay.add(Calendar.DATE, 1);
             }

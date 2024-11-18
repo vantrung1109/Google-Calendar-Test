@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity
 
         // Define the starting day for events.
         int startingDay = 10; // e.g., 10th of the month
-        int[] hours = {10, 12, 15, 11, 12}; // Sample start hours for events each day
+        int[] hours = {10, 15, 11, 12, 12, 12, 12, 12, 12, 12}; // Sample start hours for events each day
 
         for (int day = startingDay; day < startingDay + 6; day++) {
             for (int i = 0; i < hours.length; i++) {
@@ -140,7 +140,8 @@ public class MainActivity extends AppCompatActivity
                         "Sample Event " + ((day - startingDay) * hours.length + (i + 1)),
                         startTime,
                         endTime,
-                        "vantrung"
+                        "vantrung",
+                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8fg-r_QHQCXAjJQbrq3jn-rEX0cdx0Ho7qg&s"
                 );
                 event.setColor(getResources().getColor(R.color.event_color_01 + i % 2));
                 events.add(event);

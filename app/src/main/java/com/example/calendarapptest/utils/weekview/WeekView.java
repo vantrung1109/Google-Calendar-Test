@@ -7,6 +7,8 @@ import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -16,8 +18,10 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Region;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.text.Layout;
 import android.text.SpannableStringBuilder;
 import android.text.StaticLayout;
@@ -38,21 +42,32 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.OverScroller;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.ViewCompat;
 import androidx.interpolator.view.animation.FastOutLinearInInterpolator;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.example.calendarapptest.R;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Created by Raquib-ul-Alam Kanak on 7/21/2014.
@@ -1082,6 +1097,28 @@ public class WeekView extends View {
      * @param startFromPixel The left position of the day area. The events will never go any left from this value.
      * @param canvas         The canvas to draw upon.
      */
+    private Map<String, Bitmap> imageCache = new HashMap<>();
+    private void preloadImage(final String imageUrl) {
+        Glide.with(getContext())
+                .asBitmap()
+                .load(imageUrl)
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        imageCache.put(imageUrl, resource);
+                    }
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {}
+                });
+    }
+    private void drawImageFromUrl(final String imageUrl, final RectF imageRect, final Canvas canvas) {
+        Bitmap bitmap = imageCache.get(imageUrl);
+        if (bitmap != null) {
+            canvas.drawBitmap(bitmap, null, imageRect, null);
+        } else {
+            preloadImage(imageUrl); // Preload if not already cached
+        }
+    }
     private void drawEvents(Calendar date, float startFromPixel, Canvas canvas) {
         if (mEventRects != null && mEventRects.size() > 0) {
             for (int i = 0; i < mEventRects.size(); i++) {
@@ -1112,13 +1149,31 @@ public class WeekView extends View {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
+                        //TODO: draw event imageUrl
+                        // Draw event imageUrl
+                        if (mEventRects.get(i).event.getImageUrl() != null && !mEventRects.get(i).event.getImageUrl().isEmpty()) {
+                            RectF imageRect = new RectF(left, top, left + 50, top + 50); // Adjust size/position as needed
+                            drawImageFromUrl(mEventRects.get(i).event.getImageUrl(), imageRect, canvas);
+                            left += 60; // Adjust left position for title after image
+                        }
+                        for (EventRect eventRect : mEventRects) {
+                            if (eventRect.event.getImageUrl() != null && !eventRect.event.getImageUrl().isEmpty()) {
+                                preloadImage(eventRect.event.getImageUrl());
+                            }
+                        }
+
                         drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
+
+
+
                     } else
                         mEventRects.get(i).rectF = null;
                 }
             }
         }
     }
+
+
 
     /**
      * Draw all the Allday-events of a particular day.

@@ -32,6 +32,7 @@ android {
 }
 
 dependencies {
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
     implementation ("joda-time:joda-time:2.10.10")
     implementation ("org.greenrobot:eventbus:3.1.1")
     implementation(libs.appcompat)
