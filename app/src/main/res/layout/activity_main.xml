@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.MainActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:id="@+id/weekViewcontainer"
+        android:fillViewport="true"
+        android:visibility="visible"
+        android:nestedScrollingEnabled="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <com.example.calendarapptest.utils.weekview.WeekView
+                android:id="@+id/weekView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:eventTextColor="@android:color/white"
+                app:textSize="12sp"
+                app:eventTextSize="12sp"
+                app:allDayEventHeight="20dp"
+                app:hourHeight="30dp"
+                app:showNowLine="true"
+                app:nowLineColor="#000"
+                app:eventCornerRadius="3dp"
+                android:background="@android:color/white"
+                app:headerColumnPadding="16dp"
+                app:headerColumnTextColor="#606368"
+                app:headerRowPadding="9dp"
+                app:columnGap="0dp"
+                app:firstDayOfWeek="sunday"
+                app:noOfVisibleDays="3"
+                app:headerRowBackgroundColor="@android:color/white"
+                app:hourSeparatorHeight="1.3dp"
+                app:hourSeparatorColor="#EDEDED"
+                app:dayBackgroundColor="@android:color/white"
+                app:todayBackgroundColor="#ff1a73e8"
+                app:headerColumnBackground="#000"
+                app:overlappingEventGap="2dp"
+                app:todayHeaderTextColor="#ff1a73e8"
+                />
+            <View
+                android:id="@+id/myshadow"
+                android:layout_height="4dp"
+                android:layout_width="match_parent"
+                android:background="@drawable/myrect"
+                />
+
+        </RelativeLayout>
+    </ScrollView>
+
+
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
