@@ -1149,17 +1149,24 @@ public class WeekView extends View {
                         mEventRects.get(i).rectF = new RectF(left, top, right, bottom);
                         mEventBackgroundPaint.setColor(mEventRects.get(i).event.getColor() == 0 ? mDefaultEventColor : mEventRects.get(i).event.getColor());
                         canvas.drawRoundRect(mEventRects.get(i).rectF, mEventCornerRadius, mEventCornerRadius, mEventBackgroundPaint);
-                        //TODO: draw event imageUrl
-                        // Draw event imageUrl
-                        if (mEventRects.get(i).event.getImageUrl() != null && !mEventRects.get(i).event.getImageUrl().isEmpty()) {
-                            RectF imageRect = new RectF(left, top, left + 50, top + 50); // Adjust size/position as needed
-                            drawImageFromUrl(mEventRects.get(i).event.getImageUrl(), imageRect, canvas);
-                            left += 60; // Adjust left position for title after image
-                        }
-                        for (EventRect eventRect : mEventRects) {
-                            if (eventRect.event.getImageUrl() != null && !eventRect.event.getImageUrl().isEmpty()) {
-                                preloadImage(eventRect.event.getImageUrl());
-                            }
+                        //TODO: draw event (bitmap)
+                        // Draw event (bitmap)
+                        if (mEventRects.get(i).event.getBitmap() != null) {
+                            Bitmap bitmap = mEventRects.get(i).event.getBitmap();
+
+                            // Define the size and position of the image
+                            float imageLeft = left + mEventPadding;
+                            float imageTop = top + mEventPadding;
+                            float imageRight = imageLeft + Math.min(bitmap.getWidth(), 50); // Limit image size
+                            float imageBottom = imageTop + Math.min(bitmap.getHeight(), 50);
+
+                            RectF imageRect = new RectF(imageLeft, imageTop, imageRight, imageBottom);
+
+                            // Draw the Bitmap
+                            canvas.drawBitmap(bitmap, null, imageRect, null);
+
+                            // Adjust the left position for the event title
+                            left = imageRight + mEventPadding;
                         }
 
                         drawEventTitle(mEventRects.get(i).event, mEventRects.get(i).rectF, canvas, top, left);
@@ -2634,7 +2641,6 @@ public class WeekView extends View {
         public float top;
         public float bottom;
         public int noofevent;
-
         /**
          * Create a new instance of event rect. An EventRect is actually the rectangle that is drawn
          * on the calendar for a given event. There may be more than one rectangle for a single

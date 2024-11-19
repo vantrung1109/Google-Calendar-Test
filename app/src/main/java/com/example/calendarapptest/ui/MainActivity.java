@@ -1,6 +1,8 @@
 package com.example.calendarapptest.ui;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -19,11 +21,16 @@ import com.example.calendarapptest.utils.weekview.WeekViewEvent;
 import org.greenrobot.eventbus.EventBus;
 import org.joda.time.LocalDate;
 
+import java.io.IOException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity
         implements MonthLoader.MonthChangeListener
@@ -119,10 +126,12 @@ public class MainActivity extends AppCompatActivity
     }
     private List<WeekViewEvent> getEvents(int year, int month) {
         List<WeekViewEvent> events = new ArrayList<>();
+        ExecutorService executorService = Executors.newFixedThreadPool(4); // Thread pool
+        CountDownLatch latch = new CountDownLatch(6 * 8); // 6 days, 8 events per day
 
         // Define the starting day for events.
         int startingDay = 10; // e.g., 10th of the month
-        int[] hours = {10, 15, 11, 12, 12, 12, 12, 12, 12, 12}; // Sample start hours for events each day
+        int[] hours = {10, 12, 15, 11, 12, 12, 12, 12}; // Sample start hours for events each day
 
         for (int day = startingDay; day < startingDay + 6; day++) {
             for (int i = 0; i < hours.length; i++) {
@@ -135,18 +144,45 @@ public class MainActivity extends AppCompatActivity
                 Calendar endTime = (Calendar) startTime.clone();
                 endTime.set(Calendar.HOUR_OF_DAY, hours[i] + 1); // Each event lasts 1 hour
 
-                WeekViewEvent event = new WeekViewEvent(
-                        day * 10 + i, // unique ID
-                        "Sample Event " + ((day - startingDay) * hours.length + (i + 1)),
-                        startTime,
-                        endTime,
-                        "vantrung",
-                        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8fg-r_QHQCXAjJQbrq3jn-rEX0cdx0Ho7qg&s"
-                );
-                event.setColor(getResources().getColor(R.color.event_color_01 + i % 2));
-                events.add(event);
+                int eventId = day * 10 + i; // Unique ID
+                String eventTitle = "Sample Event " + ((day - startingDay) * hours.length + (i + 1));
+                int colorIndex = i % 2;
+
+                executorService.execute(() -> {
+                    try {
+                        URL url = new URL("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8fg-r_QHQCXAjJQbrq3jn-rEX0cdx0Ho7qg&s");
+                        Bitmap bitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                        WeekViewEvent event = new WeekViewEvent(
+                                eventId,
+                                eventTitle,
+                                startTime,
+                                endTime,
+                                "vantrung",
+                                bitmap
+                        );
+                        event.setColor(getResources().getColor(R.color.event_color_01 + colorIndex));
+
+                        synchronized (events) { // Synchronize to prevent concurrent modification
+                            events.add(event);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        latch.countDown(); // Decrement the latch count
+                    }
+                });
             }
         }
+
+        // Wait for all tasks to complete
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        executorService.shutdown();
+        Log.e("MainActivity-E-result", "Events size: " + events.size());
         return events;
     }
 

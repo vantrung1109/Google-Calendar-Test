@@ -2,6 +2,7 @@ package com.example.calendarapptest.utils.weekview;
 
 import static com.example.calendarapptest.utils.weekview.WeekViewUtil.isSameDay;
 
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import org.joda.time.LocalDate;
@@ -30,11 +31,12 @@ public class WeekViewEvent {
     private boolean alreadyset;
     private int myday;
 
-    public String getImageUrl() {
-        return imageUrl;
+    public Bitmap getBitmap() {
+        return bitmap;
     }
 
-    private String imageUrl;
+    private Bitmap bitmap;
+
 
     public WeekViewEvent() {
 
@@ -105,8 +107,8 @@ public class WeekViewEvent {
     public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, String accountname) {
         this(id, name, location, startTime, endTime, false, accountname);
     }
-    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, String accountname, String imageUrl) {
-        this(id, name, location, startTime, endTime, false, accountname, imageUrl);
+    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, String accountname, Bitmap bitmap) {
+        this(id, name, location, startTime, endTime, false, accountname, bitmap);
     }
 
     /**
@@ -120,11 +122,11 @@ public class WeekViewEvent {
     public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime, String accountname) {
         this(id, name, null, startTime, endTime, accountname);
     }
-    public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime, String accountname, String imageUrl) {
-        this(id, name, null, startTime, endTime, accountname, imageUrl);
+    public WeekViewEvent(long id, String name, Calendar startTime, Calendar endTime, String accountname, Bitmap bitmap) {
+        this(id, name, null, startTime, endTime, accountname, bitmap);
     }
 
-    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean b, String accountname, String imageUrl) {
+    public WeekViewEvent(long id, String name, String location, Calendar startTime, Calendar endTime, boolean b, String accountname, Bitmap bitmap) {
         this.mId = id;
         this.mName = name;
         this.mLocation = location;
@@ -132,7 +134,7 @@ public class WeekViewEvent {
         this.mEndTime = endTime;
         this.mAllDay = b;
         this.accountname = accountname;
-        this.imageUrl = imageUrl;
+        this.bitmap = bitmap;
     }
 
     public int getMyday() {
